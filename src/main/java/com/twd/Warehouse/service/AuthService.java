@@ -6,10 +6,13 @@ import com.twd.Warehouse.repository.OurUserRepo;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
+import java.util.NoSuchElementException;
 
 @Service
 public class AuthService {
@@ -44,27 +47,56 @@ public class AuthService {
         return resp;
     }
 
-    public ReqRes signIn(ReqRes signinRequest){
+    public ReqRes signIn(ReqRes signinRequest) {
         ReqRes response = new ReqRes();
 
         try {
-            authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(signinRequest.getEmail(),signinRequest.getPassword()));
-            var user = ourUserRepo.findByEmail(signinRequest.getEmail()).orElseThrow();
-            System.out.println("USER IS: "+ user);
-            var jwt = jwtUtils.generateToken(user);
-            var refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+            // Attempt authentication
+            Authentication auth = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            signinRequest.getEmail(),
+                            signinRequest.getPassword()
+                    )
+            );
+
+            // If authentication succeeds, get user details
+            OurUsers user = ourUserRepo.findByEmail(signinRequest.getEmail())
+                    .orElseThrow(() -> new RuntimeException("User not found after authentication"));
+
+            System.out.println("USER IS: " + user);
+
+            // Generate tokens
+            String jwt = jwtUtils.generateToken(user);
+            String refreshToken = jwtUtils.generateRefreshToken(new HashMap<>(), user);
+
+            // Set successful response
             response.setStatusCode(200);
             response.setToken(jwt);
             response.setRefreshToken(refreshToken);
             response.setExpirationTime("24Hr");
             response.setMessage("Successfully Signed In");
-        }catch (Exception e){
-            response.setStatusCode(500);
+
+        } catch (AuthenticationException e) {
+            // Handle authentication failures (wrong password, etc.)
+            response.setStatusCode(401); // Unauthorized
+            response.setMessage("Authentication failed: Invalid email or password");
+            response.setError(e.getMessage());
+
+        } catch (NoSuchElementException e) {
+            // Handle case where user isn't found
+            response.setStatusCode(404); // Not Found
+            response.setMessage("User not found");
+            response.setError(e.getMessage());
+
+        } catch (Exception e) {
+            // Handle other unexpected errors
+            response.setStatusCode(500); // Internal Server Error
+            response.setMessage("An error occurred during sign in");
             response.setError(e.getMessage());
         }
+
         return response;
     }
-
     public ReqRes refreshToken(ReqRes refreshTokenReqiest){
         ReqRes response = new ReqRes();
         String ourEmail = jwtUtils.extractUsername(refreshTokenReqiest.getToken());

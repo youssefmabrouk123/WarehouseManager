@@ -15,7 +15,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/public/api/scan-history")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class ScanHistoryController {
 
     private final ScanHistoryService scanHistoryService;

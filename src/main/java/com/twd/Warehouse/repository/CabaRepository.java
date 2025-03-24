@@ -14,6 +14,8 @@ import java.util.Optional;
 public interface CabaRepository extends JpaRepository<Caba, Long> {
     Optional<Caba> findByBarcode(String barcode);
 
+    Optional<Caba> findByLastScannedByAndStatus(String lastScannedBy, CabaStatus status);
+
     List<Caba> findByWagon_WagonId(String wagonId);
 
     @Query("SELECT c FROM Caba c WHERE c.wagon.wagonId = :wagonId AND c.status = :status")

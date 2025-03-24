@@ -12,7 +12,6 @@ import java.util.List;
 @RestController
 @RequestMapping("/public/api/wagons")
 @RequiredArgsConstructor
-@CrossOrigin(origins = "*")
 public class WagonController {
 
     private final WagonService wagonService;

@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -92,6 +94,11 @@ public class WagonService {
     }
 
     private CabaDTO convertCabaToDTO(Caba caba) {
+
+        LocalDateTime lastScanTime = caba.getLastScanTime();
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        String formattedDate = (lastScanTime != null) ? lastScanTime.format(formatter) : null; // Remplacez "N/A" par ce que vous voulez
+
         return CabaDTO.builder()
                 .id(caba.getId())
                 .barcode(caba.getBarcode())
@@ -106,7 +113,7 @@ public class WagonService {
                 .wipLocation(caba.getWipLocation())
                 .mg(caba.getMg())
                 .status(caba.getStatus())
-                .lastScanTime(caba.getLastScanTime())
+                .lastScanTime(formattedDate)
                 .lastScannedBy(caba.getLastScannedBy())
                 .build();
     }

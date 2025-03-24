@@ -8,6 +8,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -16,6 +17,11 @@ public class UserService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+
+    public Optional<OurUsers> getUserByMail(String username) {
+
+        return userRepository.findByEmail(username);
+    }
 
     public List<UserDTO> getAllUsers() {
         return userRepository.findAll().stream()
@@ -30,6 +36,7 @@ public class UserService {
     }
 
     public UserDTO createUser(OurUsers user) {
+
         // Encode password
         user.setPassword(passwordEncoder.encode(user.getPassword()));
 

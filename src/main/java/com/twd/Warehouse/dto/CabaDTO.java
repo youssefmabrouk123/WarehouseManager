@@ -24,6 +24,7 @@ public class CabaDTO {
     private String mg;
     private CabaStatus status;
     private String wagonId;
-    private LocalDateTime lastScanTime;
+    private String lastScanTime;
     private String lastScannedBy;
+//    private String lastTime;
 }
