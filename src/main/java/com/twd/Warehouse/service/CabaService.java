@@ -71,7 +71,7 @@ public class CabaService {
         String location = scanRequest.getLocation();
 
         // Get user
-        OurUsers user = userRepository.findByUsername(username)
+        OurUsers user = userRepository.findByEmail(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
 
         // Check if user already has an IN_PROGRESS Caba
