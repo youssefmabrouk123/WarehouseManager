@@ -21,7 +21,7 @@ public class OurUsers implements UserDetails {
     @Column(nullable = false, unique = true)
     private String email;
     private String password;
-    private String role;
+    private String role; //role : (ADMIN or USER)
     private String username;
 
     private String fullName;
